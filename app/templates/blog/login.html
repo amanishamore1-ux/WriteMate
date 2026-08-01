@@ -1,0 +1,118 @@
+{% extends 'blog/base.html' %}
+{% load static %}
+{% block title %}Login{% endblock title %}
+
+{% block content %}
+
+<style>
+body{
+  background:radial-gradient(circle at top,#020f14,#00090c);
+  color:#e6ffff;
+}
+
+h3{
+  color:#00f7ff;
+  text-shadow:0 0 10px rgba(0,247,255,.6);
+  text-align:center;
+}
+
+form.shadow{
+  background:linear-gradient(180deg,#02161b,#010c10);
+  border-radius:18px;
+  border:1px solid rgba(0,255,255,0.2);
+  box-shadow:0 0 25px rgba(0,255,255,0.2);
+}
+
+label{
+  color:#9ffcff;
+  font-weight:500;
+}
+
+input{
+  background:#010c10!important;
+  border:1px solid rgba(0,255,255,0.25)!important;
+  color:#e6ffff!important;
+}
+
+input:focus{
+  box-shadow:0 0 12px rgba(0,255,255,.6)!important;
+  border-color:#00f7ff!important;
+}
+
+.btn-primary{
+  background:linear-gradient(135deg,#00f7ff,#8a7dff);
+  border:none;
+  color:#020b10;
+  font-weight:bold;
+  box-shadow:0 0 15px rgba(138,125,255,.6);
+}
+
+.btn-primary:hover{
+  transform:translateY(-2px);
+  box-shadow:0 0 25px rgba(138,125,255,.9);
+}
+
+a{
+  color:#00f7ff;
+  text-decoration:none;
+}
+
+a:hover{
+  color:#8a7dff;
+  text-shadow:0 0 8px rgba(138,125,255,.8);
+}
+
+.alert-danger{
+  background:#2a0a14;
+  border:1px solid #ff4d6d;
+  color:#ff9bb0;
+}
+
+hr{
+  border-color:rgba(0,255,255,0.2);
+}
+</style>
+
+<div class="container">
+  <div class="row my-5">
+    <div class="col-sm-6 offset-sm-3">
+
+      <h3>Login</h3>
+      <hr>
+
+      <form method="post" novalidate class="shadow p-5">
+        {% csrf_token %}
+
+        {% for fm in form %}
+        <div class="mb-3">
+          {{ fm.label_tag }}
+          {{ fm }}
+          <small class="text-danger">{{ fm.errors|striptags }}</small>
+        </div>
+        {% endfor %}
+
+        <small>
+          <a href="{% url 'password_reset' %}">Forgot Password?</a>
+        </small>
+
+        <input type="submit" class="btn btn-primary mt-4 w-100" value="Login">
+
+        <div class="text-center fw-bold mt-4">
+          <small>
+            New to MyBlog?
+            <a href="{% url 'register' %}">Create an Account</a>
+          </small>
+        </div>
+
+        {% if form.non_field_errors %}
+          {% for error in form.non_field_errors %}
+            <p class="alert alert-danger my-3">{{ error }}</p>
+          {% endfor %}
+        {% endif %}
+      </form>
+
+    </div>
+  </div>
+</div>
+
+{% endblock content %}

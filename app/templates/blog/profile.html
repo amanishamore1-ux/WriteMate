@@ -1,0 +1,203 @@
+{% extends 'blog/base.html' %}
+{% load static %}
+
+{% block title %}My Profile{% endblock title %}
+
+{% block content %}
+
+<style>
+.profile-card{
+    background:linear-gradient(145deg,#020f14,#00090c);
+    border:1px solid rgba(0,255,255,0.2);
+    border-radius:16px;
+    padding:25px;
+    box-shadow:0 0 25px rgba(0,255,255,.2);
+    height:100%;
+}
+
+.profile-img{
+    width:110px;
+    height:110px;
+    border-radius:50%;
+    object-fit:cover;
+    border:3px solid #00f7ff;
+}
+
+.profile-btn{
+    background:linear-gradient(135deg,#00f7ff,#8a7dff);
+    color:#020b10;
+    font-weight:600;
+    border:none;
+}
+
+.btn-danger{
+    background:linear-gradient(135deg,#ff4d6d,#ff7aa2);
+    border:none;
+}
+
+.form-control{
+    background:#010c10 !important;
+    border:1px solid rgba(0,255,255,0.25) !important;
+    color:#e6ffff !important;
+}
+
+h3{ color:#00f7ff; }
+.text-info{ color:#9ffcff!important; }
+hr{ border-color:rgba(0,255,255,0.2); }
+
+/* 🔥 PREVIEW STYLE */
+.detail-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:10px 12px;
+    margin-bottom:8px;
+    border-radius:10px;
+    background:rgba(0,255,255,0.05);
+    border:1px solid rgba(0,255,255,0.15);
+    font-size:14px;
+}
+
+.detail-row span:first-child{
+    color:#9ffcff;
+}
+
+.detail-row span:last-child{
+    color:#e6ffff;
+    font-weight:600;
+}
+</style>
+
+<div class="container my-5">
+<div class="row g-4">
+
+<!-- ================= LEFT CARD ================= -->
+
+<div class="col-md-6">
+<div class="profile-card text-center">
+
+{% if profile.profile_image %} <img src="{{ profile.profile_image.url }}" class="profile-img mb-2">
+{% else %}
+
+<h1>👤</h1>
+{% endif %}
+
+<h3>{{ request.user.username }}</h3>
+<p class="text-info">{{ request.user.email }}</p>
+
+<hr>
+
+<div class="d-grid gap-2 mb-3">
+<a href="{% url 'create_blog' %}" class="btn profile-btn">✍️ Write Blog</a>
+<a href="{% url 'password_change' %}" class="btn profile-btn">🔒 Change Password</a>
+<a href="{% url 'logout' %}" class="btn btn-danger">🚪 Logout</a>
+</div>
+
+<hr>
+
+<h5 class="text-info">Edit Profile</h5>
+
+<form method="post" enctype="multipart/form-data">
+{% csrf_token %}
+
+<input type="text" name="bio" class="form-control mb-2"
+    placeholder="Bio"
+    value="{{ profile.bio|default_if_none:'' }}">
+
+<input type="url" name="website" class="form-control mb-2"
+    placeholder="Website"
+    value="{{ profile.website|default_if_none:'' }}">
+
+<div class="row">
+  <div class="col-md-6">
+    <input type="number" name="age" class="form-control mb-2"
+           placeholder="Age"
+           value="{{ profile.age|default_if_none:'' }}">
+  </div>
+
+  <div class="col-md-6">
+    <input type="text" name="city" class="form-control mb-2"
+           placeholder="City"
+           value="{{ profile.city|default_if_none:'' }}">
+  </div>
+</div>
+
+<input type="text" name="phone" class="form-control mb-2"
+    placeholder="Phone"
+    value="{{ profile.phone|default_if_none:'' }}">
+
+<input type="text" name="address" class="form-control mb-2"
+    placeholder="Address"
+    value="{{ profile.address|default_if_none:'' }}">
+
+<input type="file" name="profile_image" class="form-control mb-3">
+
+<button class="btn profile-btn w-100">💾 Save</button>
+
+</form>
+
+</div>
+</div>
+
+<!-- ================= RIGHT CARD ================= -->
+
+<div class="col-md-6">
+<div class="profile-card text-center">
+
+<h4 class="text-info mb-4">Profile Preview</h4>
+
+{% if profile.profile_image %} <img src="{{ profile.profile_image.url }}" class="profile-img mb-3">
+{% else %}
+
+<h1>👤</h1>
+{% endif %}
+
+<h3 class="mb-3">{{ request.user.username }}</h3>
+
+<hr>
+
+<div class="text-start">
+
+<div class="detail-row">
+<span>🧑 Bio</span>
+<span>{{ profile.bio|default:"-" }}</span>
+</div>
+
+<div class="detail-row">
+<span>🌐 Website</span>
+<span>
+{% if profile.website %}
+<a href="{{ profile.website }}" target="_blank" style="color:#8a7dff;">Visit</a>
+{% else %}-{% endif %}
+</span>
+</div>
+
+<div class="detail-row">
+<span>🎂 Age</span>
+<span>{{ profile.age|default:"-" }}</span>
+</div>
+
+<div class="detail-row">
+<span>📍 City</span>
+<span>{{ profile.city|default:"-" }}</span>
+</div>
+
+<div class="detail-row">
+<span>📞 Phone</span>
+<span>{{ profile.phone|default:"-" }}</span>
+</div>
+
+<div class="detail-row">
+<span>🏠 Address</span>
+<span>{{ profile.address|default:"-" }}</span>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+</div>
+
+{% endblock content %}

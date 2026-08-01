@@ -1,0 +1,81 @@
+{% extends 'blog/base.html' %}
+{% load static %}
+{% block title %}Delete Blog{% endblock title %}
+
+{% block content %}
+
+<style>
+.delete-card{
+  max-width:700px;
+  margin:auto;
+  background: linear-gradient(145deg,#16292b,#0f1c1e);
+  border-radius:18px;
+  border:1px solid rgba(255,99,99,0.35);
+  box-shadow:0 15px 35px rgba(0,0,0,0.6);
+  padding:30px;
+  text-align:center;
+}
+
+.delete-card h2{
+  color:#ff9f9f;
+}
+
+.delete-card p{
+  color:#e6fffa;
+}
+
+.btn-danger{
+  background: linear-gradient(135deg,#ff6b6b,#ff3b3b);
+  border:none;
+  font-weight:600;
+}
+
+.btn-danger:hover{
+  box-shadow:0 0 18px rgba(255,99,99,.8);
+}
+
+.btn-cancel{
+  border:1px solid rgba(47,227,194,0.6);
+  color:#2fe3c2;
+}
+
+.btn-cancel:hover{
+  background:#0a1f22;
+}
+</style>
+
+<div class="container my-5">
+
+  <div class="delete-card">
+
+    <h2 class="mb-3">⚠️ Delete Blog</h2>
+
+    <p class="mb-4">
+      Are you sure you want to delete the blog:
+      <br>
+      <strong>“{{ blog.title }}”</strong> ?
+    </p>
+
+    <p class="text-warning">
+      This action <b>cannot be undone</b>.
+    </p>
+
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="d-flex justify-content-center gap-3 mt-4">
+        <button type="submit" class="btn btn-danger px-4">
+          Yes, Delete
+        </button>
+
+        <a href="{% url 'blog_detail' object.slug %}" class="btn btn-cancel px-4">
+          Cancel
+        </a>
+      </div>
+    </form>
+
+  </div>
+
+</div>
+
+{% endblock content %}

@@ -1,0 +1,124 @@
+{% extends 'blog/base.html' %}
+{% load static %}
+{% block title %}{{ category.name }} | Category{% endblock title %}
+
+{% block content %}
+
+<style>
+.category-header{
+  background: linear-gradient(135deg,#0f3d3e,#062b2c);
+  border-radius:18px;
+  padding:30px;
+  box-shadow:0 0 30px rgba(0,255,200,.25);
+  text-align:center;
+}
+
+.category-header h2{
+  color:#7fffe1;
+}
+
+.category-header p{
+  color:#cffff3;
+}
+
+.blog-card{
+  background: linear-gradient(145deg,#16292b,#0f1c1e);
+  border-radius:16px;
+  border:1px solid rgba(47,227,194,0.25);
+  box-shadow:0 10px 25px rgba(0,0,0,0.6);
+  transition:all .3s ease;
+  height:100%;
+}
+
+.blog-card:hover{
+  transform:translateY(-6px);
+  box-shadow:0 0 25px rgba(47,227,194,0.6);
+}
+
+.blog-card h5 a{
+  color:#eafffb;
+  text-decoration:none;
+}
+
+.blog-card h5 a:hover{
+  text-decoration:underline;
+}
+
+.badge{
+  background: linear-gradient(135deg,#2fe3c2,#1dbf9f);
+  color:#081214;
+}
+
+.blog-meta{
+  color:#9ff3e7;
+  font-size:13px;
+}
+</style>
+
+<!-- ================= CATEGORY HEADER ================= -->
+<div class="container mb-5">
+  <div class="category-header">
+    <h2>📂 {{ category.name }}</h2>
+
+    {% if category.description %}
+      <p class="mt-2">{{ category.description }}</p>
+    {% else %}
+      <p class="mt-2">Browse all blogs under this category</p>
+    {% endif %}
+  </div>
+</div>
+
+<!-- ================= BLOG LIST ================= -->
+<div class="container">
+  <div class="row">
+
+    {% for blog in blogs %}
+      <div class="col-md-4 mb-4">
+        <div class="blog-card p-3">
+
+          {% if blog.featured_image %}
+            <img src="{{ blog.featured_image.url }}"
+                 class="img-fluid rounded mb-3"
+                 style="height:180px;object-fit:cover;">
+          {% endif %}
+
+          <h5 class="fw-bold">
+            <a href="{% url 'blog_detail' blog.slug %}">
+              {{ blog.title }}
+            </a>
+          </h5>
+
+          <div class="blog-meta mb-2">
+            ✍️
+            <a href="{% url 'author_profile' blog.author.username %}">
+              {{ blog.author.username }}
+            </a>
+            • {{ blog.created_at|date:"M d, Y" }}
+          </div>
+
+          <p>
+            {{ blog.content|truncatechars:100 }}
+          </p>
+
+          <div class="d-flex justify-content-between align-items-center mt-2">
+            <span class="badge">
+              {{ category.name }}
+            </span>
+
+            <a href="{% url 'blog_detail' blog.slug %}" class="btn btn-sm btn-primary">
+              Read More
+            </a>
+          </div>
+
+        </div>
+      </div>
+    {% empty %}
+      <div class="col-12 text-center">
+        <h5>No blogs found in this category 🚀</h5>
+      </div>
+    {% endfor %}
+
+  </div>
+</div>
+
+{% endblock content %}

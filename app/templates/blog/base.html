@@ -1,0 +1,418 @@
+<!doctype html>
+{% load static %}
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{% block title %}MyBlog{% endblock title %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Spline -->
+  <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.73/build/spline-viewer.js"></script>
+
+  <style>
+    body {
+      background: #000;
+      color: #eafdfc;
+      margin: 0;
+      overflow-x: hidden;
+    }
+
+    /* ================= BACKGROUND ================= */
+    .spline-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;   /* 🔥 KEY CHANGE */
+    }
+
+    spline-viewer {
+      width: 100%;
+      height: 100%;
+      pointer-events: auto;
+    }
+    /* ================= MAIN CONTENT ================= */
+    .main-content {
+      position: relative;
+      z-index: 1;
+    }
+    
+
+    /* ================= NAVBAR ================= */
+    .navbar {
+      background: rgba(2, 6, 23, 0.6);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(0,229,255,0.2);
+      box-shadow: 0 0 20px rgba(0,229,255,0.15);
+      z-index: 5;
+    }
+
+    .navbar-brand {
+      font-size: 1.5rem;
+      font-weight: bold;
+      background: linear-gradient(90deg,#00eaff,#8a2be2);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      transition: all 0.4s ease;
+    }
+
+    .navbar-brand:hover {
+      background: linear-gradient(90deg,#00eaff,#8a2be2,#ff00cc);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      transform: scale(1.15);
+      text-shadow: 0 0 10px rgba(138,43,226,0.6);
+      animation: gradientMove 2s linear infinite;
+    }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% center; }
+      100% { background-position: 200% center; }
+    }
+
+    .nav-link {
+      color: #cfffff !important;
+      font-weight: 500;
+      transition: 0.3s;
+    }
+
+    .nav-link:hover {
+      color: #00eaff !important;
+      text-shadow: 0 0 8px #00eaff;
+    }
+
+    /* SEARCH */
+    .form-control {
+      background: rgba(0,0,0,0.5);
+      border: 1px solid #00eaff;
+      color: #eafdfc;
+    }
+
+    .form-control:focus {
+      border-color: #8a2be2;
+      box-shadow: 0 0 10px #8a2be2;
+    }
+
+    .btn-primary {
+      background: linear-gradient(90deg,#00eaff,#8a2be2);
+      border: none;
+    }
+    #searchResults{
+      position:absolute;
+      top:70px;
+      right:20px;
+      width:380px;   /* 🔥 BIGGER WIDTH */
+      max-height:400px;
+      overflow-y:auto;
+
+      background: linear-gradient(145deg,#02161b,#010c10);
+      border-radius:16px;
+      border:1px solid rgba(0,255,255,0.3);
+
+      box-shadow:0 0 25px rgba(0,255,255,0.3);
+      display:none;
+      z-index:999;
+
+      padding:10px;
+    }
+
+    /* EACH ITEM */
+    .search-item{
+      padding:12px 14px;
+      border-radius:10px;
+      margin-bottom:6px;
+
+      transition:0.3s;
+      cursor:pointer;
+    }
+
+    /* TITLE */
+    .search-title{
+      font-size:16px;
+      font-weight:600;
+      color:#eafdfc;
+    }
+
+    /* AUTHOR */
+    .search-author{
+      font-size:12px;
+      color:#9ffcff;
+    }
+
+    /* SCROLLBAR */
+    #searchResults::-webkit-scrollbar{
+      width:6px;
+    }
+    #searchResults::-webkit-scrollbar-thumb{
+      background:#00eaff;
+      border-radius:10px;
+    }
+
+    .search-container{
+      position:relative;
+    }
+
+    /* 🔥 PERFECT ALIGNMENT */
+    #searchResults{
+      position:absolute;
+      top:100%;       /* directly below input */
+      left:0;
+      width:100%;     /* SAME WIDTH AS INPUT + BUTTON */
+      margin-top:8px;
+
+      background: linear-gradient(145deg,#02161b,#010c10);
+      border-radius:16px;
+      border:1px solid rgba(0,255,255,0.3);
+
+      box-shadow:0 0 25px rgba(0,255,255,0.3);
+      display:none;
+      z-index:999;
+
+      padding:10px;
+    }
+
+    /* ITEMS */
+    .search-item{
+      padding:12px;
+      border-radius:10px;
+      transition:0.3s;
+    }
+
+
+    /* ================= CARDS ================= */
+    .card {
+      position: relative;
+      z-index: 3;
+      background: rgba(10, 20, 30, 0.75);
+      backdrop-filter: blur(15px);
+      border-radius: 18px;
+      border: 1px solid rgba(0,229,255,0.2);
+      box-shadow: 0 0 20px rgba(0,229,255,0.2);
+      color: #eafdfc;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-5px) scale(1.02);
+      z-index: 6;
+    }
+
+    /* ================= BLOG INTERACTION FIX ================= */
+    .blog-section {
+      position: relative;
+      z-index: 10;
+    }
+
+    .blog-section::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: auto;
+    }
+
+    .blog-section * {
+      position: relative;
+      z-index: 2;
+    }
+
+    /* ================= FOOTER ================= */
+    footer {
+      background: linear-gradient(135deg, #020617, #001f24);
+      color: #eafdfc;
+      border-top: 1px solid rgba(0,229,255,0.2);
+    }
+
+    .footer-link {
+      color: #ccc;
+      text-decoration: none;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .footer-link:hover {
+      color: #00eaff;
+    }
+
+    spline-viewer {
+      pointer-events: auto;
+    }
+
+    .nav-link img:hover{
+      transform: scale(1.1);
+      box-shadow: 0 0 10px #00eaff;
+      transition: 0.3s;
+    }
+   
+  </style>
+</head>
+
+<body>
+
+<!-- BACKGROUND -->
+<div class="spline-bg">
+  <spline-viewer 
+    url="https://prod.spline.design/jPlo1inmM9JbhWNI/scene.splinecode"
+    events-target="global"
+  ></spline-viewer>
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+<div class="container d-flex justify-content-between align-items-center">
+
+  <!-- LEFT SPACER -->
+  <div style="width:200px;"></div>
+
+  <!-- CENTER NAV -->
+  <div class="d-flex align-items-center gap-4 justify-content-center flex-grow-1">
+
+      <a class="navbar-brand fw-bold fst-italic" href="{% url 'home' %}">
+        MyBlog
+      </a>
+
+      {% if request.user.is_authenticated %}
+        <a class="nav-link" href="{% url 'create_blog' %}">Write</a>
+
+        <!-- 🔥 NEW PROFILE BUTTON -->
+        <a class="nav-link d-flex align-items-center gap-2" href="{% url 'profile' %}">
+          Profile
+        </a>
+
+        <a class="nav-link" href="{% url 'author_profile' request.user.username %}">
+          Portfolio
+        </a>
+
+        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+
+        <a class="nav-link" href="{% url 'about' %}">About</a>
+
+      {% else %}
+        <a class="nav-link" href="{% url 'login' %}">Login</a>
+        <a class="nav-link" href="{% url 'register' %}">Register</a>
+      {% endif %}
+    </div>
+    <div class="search-container">
+      <form class="d-flex position-relative">
+        <input id="searchInput" class="form-control me-2" type="search" placeholder="Search...">
+        
+        <button class="btn btn-primary" type="button">
+          <i class="fas fa-search"></i>
+        </button>
+
+        <!-- RESULTS -->
+        <div id="searchResults"></div>
+      </form>
+    </div>
+
+  </div>
+</nav>
+
+<!-- CONTENT -->
+<div class="container mt-4 main-content">
+  {% block content %}{% endblock %}
+</div>
+
+<!-- FOOTER -->
+<footer class="container-fluid pt-5 pb-3 mt-5">
+  <div class="container">
+    <div class="row">
+
+      <div class="col-md-4">
+        <h5 style="color:#00eaff;">MyBlog</h5>
+        <p style="color:#bbb;">
+          Share ideas, explore creativity, and connect with the world.
+        </p>
+      </div>
+
+      <div class="col-md-4">
+        <h5 style="color:#00eaff;">Quick Links</h5>
+        <a href="{% url 'home' %}" class="footer-link">Home</a>
+        <a href="#" class="footer-link">Blogs</a>
+        <a href="#" class="footer-link">Categories</a>
+      </div>
+
+      <div class="col-md-4 text-center">
+        <h5 style="color:#00eaff;">Follow Us</h5>
+        <i class="fab fa-github me-2"></i>
+        <i class="fab fa-linkedin me-2"></i>
+        <i class="fab fa-instagram me-2"></i>
+      </div>
+
+    </div>
+
+    <hr style="border-color:rgba(0,229,255,0.2);">
+
+    <div class="text-center">
+      <small>© 2026 MyBlog — Built by Anisha</small>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
+
+<script>
+const input = document.getElementById("searchInput");
+const resultsBox = document.getElementById("searchResults");
+const container = document.querySelector(".search-container");
+
+// 🔍 SEARCH
+input.addEventListener("keyup", function() {
+    let query = input.value;
+
+    if (query.length < 2) {
+        resultsBox.style.display = "none";
+        return;
+    }
+
+    fetch(`/search/?q=${query}`)
+    .then(res => res.json())
+    .then(data => {
+
+        resultsBox.innerHTML = "";
+        resultsBox.style.display = "block";
+
+        if (data.results.length === 0) {
+            resultsBox.innerHTML = "<p style='padding:10px;color:#aaa;'>No results</p>";
+            return;
+        }
+
+        data.results.forEach(item => {
+            resultsBox.innerHTML += `
+                <a href="/blog/${item.slug}/" class="search-item" style="text-decoration:none;">
+                    <div class="search-title">${item.title}</div>
+                    <div class="search-author">${item.author}</div>
+                </a>
+            `;
+        });
+    });
+});
+
+
+// 🔥 HIDE WHEN MOUSE LEAVES
+container.addEventListener("mouseleave", () => {
+    resultsBox.style.display = "none";
+});
+
+
+// 🔥 ALSO SHOW AGAIN WHEN MOUSE ENTERS
+container.addEventListener("mouseenter", () => {
+    if (input.value.length >= 2) {
+        resultsBox.style.display = "block";
+    }
+});
+</script>

@@ -1,0 +1,233 @@
+{% extends 'blog/base.html' %}
+{% load static %}
+
+{% block title %}Home{% endblock title %}
+
+{% block content %}
+
+<style>
+
+/* ===== GRADIENT TEXT FIX ===== */
+.gradient-text {
+  background: linear-gradient(90deg, #00eaff, #8a2be2, #00c3ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gradient-text2 {
+  background: linear-gradient(90deg, #8a2be2, #00eaff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ===== VIDEO CARD ===== */
+.video-wrapper {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  background: black;
+  border-radius: 12px;
+}
+
+/* BLUR BACKGROUND */
+.video-bg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(20px) brightness(0.6);
+  transform: scale(1.2);
+}
+
+/* MAIN VIDEO */
+.video-main {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  z-index: 2;
+}
+
+/* IMAGE FALLBACK */
+.blog-img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+/* HERO */
+#heroText {
+  background: transparent;
+}
+
+</style>
+
+<!-- ================= HERO ================= -->
+<div id="heroText" style="
+position: relative;
+z-index: 2;
+display:flex;
+align-items:center;
+min-height:75vh;
+padding-left:50px;
+padding-top:120px;
+">
+
+  <div style="max-width:650px;">
+
+    <p style="font-size:12px; letter-spacing:3px; color:#ffd166;">
+      THE OPEN BLOGGING PLATFORM
+    </p>
+
+    <h1 style="font-size:4rem; font-weight:800;">
+
+      <span class="gradient-text">Write anything.</span><br>
+
+      <span style="color:#ffd166;">Read</span>
+
+      <span class="gradient-text2">everything.</span>
+
+    </h1>
+
+    <p style="color:#aaa;">
+      MyBlog is a space for creators and innovators.
+    </p>
+
+    <div style="display:flex; gap:15px; margin-top:20px;">
+      {% if request.user.is_authenticated %}
+        <a href="{% url 'create_blog' %}" style="
+          padding:12px 28px;
+          border-radius:8px;
+          color:black;
+          background:#ffd166;">
+          ✍️ Start writing
+        </a>
+      {% else %}
+        <a href="{% url 'login' %}?next={% url 'create_blog' %}" style="
+          padding:12px 28px;
+          border-radius:8px;
+          color:black;
+          background:#ffd166;">
+          ✍️ Start writing
+        </a>
+      {% endif %}
+
+      <a href="#blogs" style="
+      padding:12px 28px;
+      border-radius:8px;
+      color:#00eaff;
+      border:1px solid #00eaff;">
+        🚀 Browse
+      </a>
+    </div>
+
+  </div>
+</div>
+
+<!-- ================= BLOG SECTION ================= -->
+<div id="blogs" class="row px-4 mt-3">
+
+{% for blog in blogs %}
+
+<div class="col-md-4 mb-4">
+  <div class="card h-100" style="
+  background:#16292b;
+  border-radius:12px;
+  overflow:hidden;
+  ">
+
+    <!-- VIDEO / IMAGE -->
+    {% if blog.video %}
+
+    <div class="video-wrapper">
+
+      <!-- BLUR BACKGROUND -->
+      <video class="video-bg"
+             autoplay muted loop playsinline>
+        <source src="{{ blog.video.url }}">
+      </video>
+
+      <!-- MAIN VIDEO -->
+      <video class="video-main blog-video"
+             autoplay muted loop playsinline>
+        <source src="{{ blog.video.url }}">
+      </video>
+
+    </div>
+
+    {% elif blog.featured_image %}
+
+    <img src="{{ blog.featured_image.url }}" class="blog-img">
+
+    {% endif %}
+
+    <div class="card-body d-flex flex-column">
+
+      <h5>
+        <a href="{% url 'blog_detail' blog.slug %}" style="color:white;">
+          {{ blog.title }}
+        </a>
+      </h5>
+
+      <p style="color:#7dd; font-size:13px;">
+        ✍️ {{ blog.author.username }} · {{ blog.created_at|date:"M d, Y" }}
+      </p>
+
+      <p style="color:#aaa;">
+        {{ blog.content|truncatechars:100 }}
+      </p>
+
+      <div class="mt-auto d-flex justify-content-between align-items-center">
+        <div>
+          ❤️ {{ blog.total_likes }} 💬 {{ blog.total_comments }}
+        </div>
+
+        <a href="{% url 'blog_detail' blog.slug %}" class="btn btn-sm"
+           style="background:#00eaff; color:black;">
+          Read
+        </a>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{% empty %}
+<div class="text-center mt-5">
+  <h4>No blogs yet 🚀</h4>
+</div>
+{% endfor %}
+
+</div>
+
+<!-- ================= SCRIPT ================= -->
+<script>
+document.querySelectorAll('.blog-video').forEach(video => {
+
+    video.addEventListener('mouseenter', () => {
+        video.muted = false;
+        video.volume = 0;
+
+        let vol = 0;
+        let fade = setInterval(() => {
+            if(vol < 1){
+                vol += 0.1;
+                video.volume = vol;
+            } else clearInterval(fade);
+        }, 50);
+
+        video.play();
+    });
+
+    video.addEventListener('mouseleave', () => {
+        video.muted = true;
+    });
+
+});
+</script>
+
+{% endblock %}

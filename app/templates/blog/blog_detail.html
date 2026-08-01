@@ -1,0 +1,274 @@
+{% extends 'blog/base.html' %}
+{% load static %}
+{% block title %}{{ blog.title }}{% endblock title %}
+
+{% block content %}
+
+<style>
+.blog-container{max-width:900px;margin:auto;}
+
+/* BLOG CARD */
+.blog-card{
+  background:linear-gradient(145deg,#020f14,#00090c);
+  border-radius:16px;
+  padding:30px;
+  border:1px solid rgba(0,255,255,0.15);
+  box-shadow:0 10px 25px rgba(0,0,0,0.8);
+  color:#e6ffff;
+}
+
+/* LINKS */
+.blog-card a{
+  color:#00f7ff;
+  text-decoration:none;
+}
+.blog-card a:hover{
+  color:#8a7dff;
+}
+
+/* COMMENT BOX */
+.comment-box{
+  background:linear-gradient(145deg,#02161b,#010c10);
+  padding:20px;
+  border-radius:12px;
+  border:1px solid rgba(0,255,255,0.15);
+}
+
+/* COMMENT */
+.comment{
+  background:#010c10;
+  padding:15px;
+  border-radius:10px;
+  margin-bottom:12px;
+  border:1px solid rgba(0,255,255,0.08);
+  color:#d9ffff;
+}
+
+/* REPLY */
+.reply{
+  margin-left:30px;
+  border-left:2px solid #00f7ff;
+  padding-left:15px;
+}
+
+/* BUTTONS */
+.btn-primary{
+  background:linear-gradient(135deg,#00f7ff,#8a7dff);
+  border:none;
+  color:#020b10;
+}
+.btn-primary:hover{
+  background:linear-gradient(135deg,#8a7dff,#00f7ff);
+  box-shadow:0 0 10px rgba(138,125,255,0.7);
+}
+
+.btn-success{
+  background:linear-gradient(135deg,#00f7ff,#00c3ff);
+  border:none;
+  color:#021014;
+}
+.btn-success:hover{
+  background:linear-gradient(135deg,#00c3ff,#00f7ff);
+}
+
+.btn-warning{
+  background:linear-gradient(135deg,#8a7dff,#5f9cff);
+  border:none;
+  color:#020b10;
+}
+.btn-warning:hover{
+  box-shadow:0 0 10px rgba(138,125,255,0.6);
+}
+
+.btn-danger{
+  background:linear-gradient(135deg,#ff4d6d,#ff7aa2);
+  border:none;
+  color:#020b10;
+}
+.btn-danger:hover{
+  box-shadow:0 0 10px rgba(255,77,109,0.6);
+}
+
+.btn-outline-danger{
+  border:1px solid #ff4d6d;
+  color:#ff7aa2;
+  background:transparent;
+}
+.btn-outline-danger:hover{
+  background:#ff4d6d;
+  color:#000;
+}
+
+/* TEXT */
+h2,h4,strong{
+  color:#00f7ff;
+}
+
+small{
+  color:#7adede;
+}
+
+hr{
+  border-color:rgba(0,255,255,0.2);
+}
+</style>
+
+<div class="container my-5 blog-container">
+
+<div class="blog-card">
+
+    {% if blog.featured_image %}
+        <img src="{{ blog.featured_image.url }}" class="img-fluid rounded mb-4">
+    {% endif %}
+
+    {% if blog.video %}
+    <div class="mb-4">
+
+        <video width="100%" controls style="
+            border-radius:12px;
+            box-shadow:0 0 20px rgba(0,255,255,0.25);
+        ">
+            <source src="{{ blog.video.url }}">
+            Your browser does not support the video tag.
+        </video>
+
+    </div>
+    {% endif %}
+
+    <h2>{{ blog.title }}</h2>
+
+    <p>
+      By
+      <a href="{% url 'author_profile' blog.author.username %}">
+        {{ blog.author.username }}
+      </a>
+      • {{ blog.created_at|date:"M d, Y" }}
+
+      {% if blog.category %}
+        • <a href="{% url 'category' blog.category.slug %}">
+          {{ blog.category.name }}
+        </a>
+      {% endif %}
+    </p>
+
+    <hr>
+
+    {{ blog.content|linebreaks }}
+
+    <hr>
+
+    {% if user.is_authenticated %}
+      <form method="post" action="{% url 'blog_like' blog.id %}">
+        {% csrf_token %}
+        <button type="submit"
+                class="btn {% if is_liked %}btn-danger{% else %}btn-outline-danger{% endif %}">
+          ❤️ {{ blog.likes.count }}
+        </button>
+      </form>
+    {% else %}
+      <a href="{% url 'login' %}">Login to like</a>
+    {% endif %}
+
+    {% if request.user == blog.author %}
+      <div class="mt-3">
+        <a href="{% url 'edit_blog' blog.id %}" class="btn btn-warning btn-sm">
+          Edit
+        </a>
+
+        <a href="{% url 'delete_blog' blog.id %}" class="btn btn-danger btn-sm">
+          Delete
+        </a>
+      </div>
+    {% endif %}
+
+</div>
+
+<div class="mt-5">
+
+<h4>Comments ({{ comments.count }})</h4>
+
+{% if user.is_authenticated %}
+<div class="comment-box mb-4">
+<form method="post" action="{% url 'add_comment' blog.id %}">
+{% csrf_token %}
+{{ comment_form.as_p }}
+
+<button class="btn btn-success">
+Post Comment
+</button>
+
+</form>
+</div>
+{% else %}
+
+<p>
+<a href="{% url 'login' %}">
+Login
+</a>
+to comment
+</p>
+
+{% endif %}
+
+{% for comment in comments %}
+{% if not comment.parent %}
+
+<div class="comment">
+
+<strong>{{ comment.user.username }}</strong>
+
+<small>
+ • {{ comment.created_at|date:"M d, Y" }}
+</small>
+
+<p>{{ comment.comment }}</p>
+
+{% if request.user == blog.author %}
+
+<form method="post" action="{% url 'reply_comment' comment.id %}">
+
+{% csrf_token %}
+
+<textarea name="reply"
+class="form-control mt-2"
+placeholder="Reply as author"
+required></textarea>
+
+<button class="btn btn-primary btn-sm mt-2">
+Reply
+</button>
+
+</form>
+
+{% endif %}
+
+{% for reply in comment.replies.all %}
+
+<div class="reply mt-3">
+
+<strong>{{ reply.user.username }} (Author)</strong>
+
+<small>
+ • {{ reply.created_at|date:"M d, Y" }}
+</small>
+
+<p>{{ reply.comment }}</p>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+{% endif %}
+{% empty %}
+
+<p class="text-info">No comments yet 🚀</p>
+
+{% endfor %}
+
+</div>
+
+</div>
+
+{% endblock content %}

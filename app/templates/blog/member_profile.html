@@ -1,0 +1,114 @@
+<!-- ================= MEMBER PROFILE (CUSTOM) ================= -->
+
+<style>
+.member-box{
+  background: linear-gradient(145deg,#020f14,#00090c);
+  border-radius:18px;
+  border:1px solid rgba(0,255,255,0.15);
+  padding:25px;
+  box-shadow:0 0 20px rgba(0,255,255,0.15);
+  transition:0.3s ease;
+}
+
+.member-box:hover{
+  box-shadow:0 0 30px rgba(138,125,255,0.5);
+  transform:translateY(-5px);
+}
+
+.member-avatar{
+  width:90px;
+  height:90px;
+  border-radius:50%;
+  object-fit:cover;
+  border:3px solid #8a7dff;
+}
+
+.member-name{
+  color:#00f7ff;
+  font-weight:600;
+  font-size:20px;
+}
+
+.member-role{
+  font-size:13px;
+  color:#9ffcff;
+}
+
+.member-stats{
+  display:flex;
+  justify-content:space-around;
+  margin-top:15px;
+}
+
+.member-stats div{
+  text-align:center;
+}
+
+.member-stats h6{
+  color:#00f7ff;
+  margin:0;
+}
+
+.member-stats span{
+  font-size:12px;
+  color:#9ffcff;
+}
+</style>
+
+
+<div class="container mb-5">
+  <h4 class="text-info mb-4">👥 Member Profile</h4>
+
+  <div class="row g-4">
+
+    <!-- MEMBER CARD -->
+    <div class="col-md-4">
+      <div class="member-box text-center">
+
+        {% if author.profile.profile_image %}
+          <img src="{{ author.profile.profile_image.url }}" class="member-avatar mb-2">
+        {% else %}
+          <div style="font-size:50px;">👤</div>
+        {% endif %}
+
+        <div class="member-name mt-2">
+          {{ author.username }}
+        </div>
+
+        <div class="member-role">
+          Content Creator
+        </div>
+
+        <!-- BIO SHORT -->
+        {% if author.profile.bio %}
+          <p class="mt-2 small text-light">
+            {{ author.profile.bio|truncatechars:80 }}
+          </p>
+        {% endif %}
+
+        <!-- STATS -->
+        <div class="member-stats">
+          <div>
+            <h6>{{ blogs|length }}</h6>
+            <span>Posts</span>
+          </div>
+          <div>
+            <h6>--</h6>
+            <span>Followers</span>
+          </div>
+          <div>
+            <h6>--</h6>
+            <span>Likes</span>
+          </div>
+        </div>
+
+        <!-- BUTTON -->
+        <a href="#" class="btn btn-primary btn-sm mt-3">
+          View Full Profile
+        </a>
+
+      </div>
+    </div>
+
+  </div>
+</div>

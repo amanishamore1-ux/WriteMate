@@ -1,0 +1,116 @@
+{% extends 'blog/base.html' %}
+{% load static %}
+{% block title %}Edit Blog{% endblock title %}
+
+{% block content %}
+
+<style>
+.edit-card{
+  max-width:900px;
+  margin:auto;
+  background: linear-gradient(145deg,#16292b,#0f1c1e);
+  border-radius:18px;
+  border:1px solid rgba(47,227,194,0.25);
+  box-shadow:0 15px 35px rgba(0,0,0,0.6);
+  padding:30px;
+}
+
+.edit-card h2{
+  color:#7fffe1;
+}
+
+label{
+  color:#cffff3;
+  font-weight:500;
+}
+
+input, textarea, select{
+  background:#0a1f22 !important;
+  border:1px solid rgba(47,227,194,0.35) !important;
+  color:#e6fffa !important;
+  border-radius:8px;
+}
+
+input:focus, textarea:focus, select:focus{
+  box-shadow:0 0 12px rgba(47,227,194,.6);
+  border-color:#2fe3c2;
+}
+
+.current-image{
+  border-radius:12px;
+  border:1px solid rgba(47,227,194,0.4);
+}
+
+.btn-update{
+  background: linear-gradient(135deg,#2fe3c2,#1dbf9f);
+  border:none;
+  color:#081214;
+  font-weight:600;
+}
+
+.btn-update:hover{
+  box-shadow:0 0 20px rgba(47,227,194,.9);
+  transform:translateY(-1px);
+}
+
+.btn-cancel{
+  border:1px solid rgba(47,227,194,0.6);
+  color:#2fe3c2;
+}
+
+.btn-cancel:hover{
+  background:#0a1f22;
+}
+</style>
+
+<div class="container my-5">
+
+  <div class="edit-card">
+
+    <h2 class="mb-4">✏️ Edit Blog</h2>
+
+    <!-- IMPORTANT: enctype for image -->
+    <form method="post" enctype="multipart/form-data" novalidate>
+      {% csrf_token %}
+
+      {% for field in form %}
+        <div class="mb-3">
+          {{ field.label_tag }}
+          {{ field }}
+          {% if field.errors %}
+            <small class="text-danger">
+              {{ field.errors|striptags }}
+            </small>
+          {% endif %}
+        </div>
+      {% endfor %}
+
+      <!-- CURRENT IMAGE PREVIEW -->
+      {% if object.featured_image %}
+        <div class="mb-3">
+          <label class="form-label">Current Image</label><br>
+          <img src="{{ object.featured_image.url }}"
+               class="img-fluid current-image"
+               style="max-height:220px;">
+        </div>
+      {% endif %}
+
+      <div class="d-flex justify-content-between mt-4">
+        <button type="submit" class="btn btn-update px-4">
+          Update
+        </button>
+
+        <!-- Cancel → go back to blog -->
+        <a href="{% url 'blog_detail' object.slug %}"
+           class="btn btn-cancel px-4">
+          Cancel
+        </a>
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
+
+{% endblock content %}

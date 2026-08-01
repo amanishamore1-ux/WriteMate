@@ -1,0 +1,410 @@
+{% extends 'blog/base.html' %}
+{% load static %}
+{% block title %}Write a Blog{% endblock title %}
+
+{% block content %}
+
+<style>
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+.cursor {
+  animation: blink 1s infinite;
+}
+
+.create-card{
+  background:linear-gradient(145deg,#020f14,#00090c);
+  border-radius:18px;
+  border:1px solid rgba(0,255,255,0.15);
+  box-shadow:0 15px 35px rgba(0,0,0,0.8);
+  padding:30px;
+}
+
+.create-card h2{
+  color:#00f7ff;
+}
+
+label{
+  color:#9ffcff;
+  font-weight:500;
+}
+
+input, textarea, select{
+  background:#010c10 !important;
+  border:1px solid rgba(0,255,255,0.25) !important;
+  color:#e6ffff !important;
+  border-radius:8px;
+}
+
+input:focus, textarea:focus, select:focus{
+  box-shadow:0 0 12px rgba(0,255,255,.6);
+  border-color:#00f7ff;
+}
+
+.btn-publish{
+  background:linear-gradient(135deg,#00f7ff,#8a7dff);
+  border:none;
+  color:#020b10;
+  font-weight:600;
+}
+
+.btn-publish:hover{
+  box-shadow:0 0 20px rgba(138,125,255,.9);
+}
+
+.btn-outline-light{
+  border:1px solid #00f7ff;
+  color:#00f7ff;
+}
+
+.btn-outline-light:hover{
+  background:#00f7ff;
+  color:#000;
+}
+
+.ai-box{
+  background:linear-gradient(145deg,#02161b,#010c10);
+  border:1px solid rgba(0,255,255,0.2);
+  padding:20px;
+  border-radius:15px;
+}
+
+.ai-box h4{
+  color:#00f7ff;
+}
+
+</style>
+
+<div class="container my-5">
+<div class="row">
+
+<!-- ================= BLOG FORM ================= -->
+
+<div class="col-md-8">
+<div class="create-card">
+
+<h2 class="mb-4">✍️ Write a New Blog</h2>
+
+<form id="blogForm" method="post" enctype="multipart/form-data">
+{% csrf_token %}
+
+<div class="mb-3">
+  {{ form.title.label_tag }}
+  {{ form.title }}
+</div>
+
+<div class="mb-3">
+  <label>Select Category</label>
+  {{ form.category }}
+</div>
+
+<div class="text-center text-info mb-2">OR</div>
+
+<div class="mb-3">
+  <label>Create New Category</label>
+  {{ form.new_category }}
+  <small style="color:#7dd;">💡 Create your own category if not listed</small>
+</div>
+
+<div class="mb-3">
+  {{ form.featured_image.label_tag }}
+  {{ form.featured_image }}
+</div>
+
+<div class="mb-3">
+  {{ form.video.label_tag }}
+  {{ form.video }}
+</div>
+
+<div class="mb-3">
+  {{ form.content.label_tag }}
+  {{ form.content }}
+</div>
+
+<div class="mb-3">
+  {{ form.status.label_tag }}
+  {{ form.status }}
+</div>
+
+<div class="d-flex justify-content-between mt-4">
+<button type="submit" class="btn btn-publish px-4">Publish</button>
+<a href="{% url 'home' %}" class="btn btn-outline-light">Cancel</a>
+</div>
+
+</form>
+
+</div>
+</div>
+
+<!-- ================= AI PANEL ================= -->
+
+<div class="col-md-4">
+<div class="ai-box">
+
+<h4>🤖 AI Blog Generator</h4>
+
+<p>Enter details and AI will generate blog.</p>
+
+<input type="text" id="ai_title" class="form-control mb-3" placeholder="Blog Title">
+<input type="text" id="ai_category" class="form-control mb-3" placeholder="Category">
+
+<textarea id="ai_keywords" class="form-control mb-3" rows="5"
+placeholder="Enter keywords"></textarea>
+
+<button class="btn btn-publish w-100" onclick="generateBlog()">
+Generate Blog
+</button>
+
+<button class="btn btn-outline-light w-100 mt-2" onclick="checkAI()">
+Check AI Content
+</button>
+<button class="btn btn-publish w-100 mt-2" onclick="humanizeContent()">
+✨ Humanize Content
+</button>
+<div id="aiResult" class="mt-3"></div>
+
+<div id="loading" style="display:none;">Generating...</div>
+
+</div>
+</div>
+
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+
+// 🔥 CATEGORY SMART UX
+const newCat = document.getElementById("id_new_category");
+const dropdown = document.getElementById("id_category");
+
+newCat.addEventListener("input", function(){
+    dropdown.disabled = this.value.trim() !== "";
+});
+
+dropdown.addEventListener("change", function(){
+    if(this.value !== ""){
+        newCat.value = "";
+    }
+});
+
+// ================= GLOBAL AI STATE =================
+let latestAIScore = null;
+
+// ================= AI GENERATE =================
+function generateBlog(){
+
+let title = document.getElementById("ai_title").value
+let category = document.getElementById("ai_category").value
+let keywords = document.getElementById("ai_keywords").value
+
+document.getElementById("loading").style.display="block"
+
+fetch("{% url 'ai_generate' %}",{
+method:"POST",
+headers:{
+"Content-Type":"application/x-www-form-urlencoded",
+"X-CSRFToken":"{{ csrf_token }}"
+},
+body:`title=${title}&category=${category}&keywords=${keywords}`
+})
+.then(res=>res.json())
+.then(data=>{
+document.getElementById("loading").style.display="none"
+document.getElementById("id_content").value = data.content
+
+// reset AI check after new generation
+latestAIScore = null;
+document.getElementById("aiResult").innerHTML = "";
+})
+}
+
+// ================= AI CHECK =================
+function checkAI(){
+
+let content = document.getElementById("id_content").value;
+
+fetch("{% url 'ai_detection' %}",{
+method:"POST",
+headers:{
+"Content-Type":"application/x-www-form-urlencoded",
+"X-CSRFToken":"{{ csrf_token }}"
+},
+body:`content=${content}`
+})
+.then(res=>res.json())
+.then(data=>{
+
+latestAIScore = data.ai_percent;
+
+let color = data.ai_percent < 5 ? "#00ff9c" :
+            data.ai_percent < 8 ? "#ffc107" : "#ff4d4d";
+
+document.getElementById("aiResult").innerHTML = `
+<div style="color:${color};font-weight:bold">
+AI Score: ${data.ai_percent}%
+</div>
+
+<div style="
+margin-top:10px;
+max-height:200px;
+overflow:auto;
+padding:10px;
+border:1px solid #00f7ff33;
+border-radius:10px;
+">
+${data.highlighted}
+</div>
+`;
+
+})
+}
+
+// ================= SUBMIT =================
+document.getElementById("blogForm").addEventListener("submit", function(e){
+
+e.preventDefault();
+
+// 🚨 FORCE AI CHECK
+if(latestAIScore === null){
+    Swal.fire({
+        icon: "warning",
+        title: "⚠ Check AI First",
+        text: "Please check AI content before publishing."
+    });
+    return;
+}
+
+if(latestAIScore > 8){
+    Swal.fire({
+        icon: "error",
+        title: "❌ Cannot Publish",
+        html: `AI Score is <b>${latestAIScore}%</b><br>Reduce it below 8%.`
+    });
+    return;
+}
+
+let formData = new FormData(this);
+
+fetch("", {
+    method: "POST",
+    body: formData
+})
+.then(res => res.json())
+.then(data => {
+
+    if(data.status === "error"){
+
+        // 🔥 AI ERROR
+        if(data.ai_percent){
+            Swal.fire({
+                icon: "warning",
+                title: "⚠ Too Much AI Content",
+                html: `AI Score: <b>${data.ai_percent}%</b><br>Please humanize.`,
+            });
+            return;
+        }
+
+        // 🔥 COPYRIGHT ERROR
+        Swal.fire({
+            icon: "error",
+            title: "❌ Copyright!",
+            html: `<b>${data.similarity}%</b> similar content found`,
+        });
+
+    } else {
+        Swal.fire({
+            icon: "success",
+            title: "✅ Published!",
+        }).then(()=>{
+            window.location.href = "{% url 'home' %}";
+        });
+    }
+
+});
+});
+
+function humanizeContent(){
+
+let content = document.getElementById("id_content").value;
+
+Swal.fire({
+    title: "Humanizing...",
+    text: "Improving your blog...",
+    allowOutsideClick: false,
+    didOpen: () => {
+        Swal.showLoading()
+    }
+});
+
+fetch("{% url 'humanize_content' %}",{
+method:"POST",
+headers:{
+"Content-Type":"application/x-www-form-urlencoded",
+"X-CSRFToken":"{{ csrf_token }}"
+},
+body:`content=${content}`
+})
+.then(res=>res.json())
+.then(data=>{
+
+document.getElementById("id_content").value = data.content;
+
+// reset AI score → force recheck
+latestAIScore = null;
+
+Swal.fire({
+    icon:"success",
+    title:"✨ Humanized!",
+    text:"Now check AI score again."
+});
+
+});
+}
+
+function generateBlog(){
+
+let title = document.getElementById("ai_title").value
+let category = document.getElementById("ai_category").value
+let keywords = document.getElementById("ai_keywords").value
+
+let contentBox = document.getElementById("id_content");
+contentBox.value = "";
+
+fetch(`/ai-generate-stream/?title=${title}&category=${category}&keywords=${keywords}`)
+.then(response => {
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+
+    function read(){
+        reader.read().then(({done, value}) => {
+
+            if(done){
+                contentBox.value = contentBox.value.replace(/▌$/, "");
+                return;
+            }
+
+            let chunk = decoder.decode(value);
+
+            // remove old cursor before adding new text
+            contentBox.value = contentBox.value.replace(/▌$/, "");
+
+            // add new text + cursor
+            contentBox.value += chunk + "▌";
+
+            contentBox.scrollTop = contentBox.scrollHeight;
+
+            read();
+        });
+    }
+
+    read();
+});
+}
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,201 @@
+{% extends 'blog/base.html' %}
+{% load static %}
+{% block title %}About{% endblock title %}
+
+{% block content %}
+
+<style>
+body{
+  background:radial-gradient(circle at top,#020f14,#00090c);
+  color:#e6ffff;
+}
+
+h3{
+  color:#00f7ff;
+  text-shadow:0 0 10px rgba(0,247,255,.6);
+  text-align:center;
+}
+
+.about-box{
+  background:linear-gradient(180deg,#02161b,#010c10);
+  border-radius:18px;
+  border:1px solid rgba(0,255,255,0.2);
+  box-shadow:0 0 25px rgba(0,255,255,0.2);
+  padding:30px;
+}
+
+p{
+  color:#9ffcff;
+  line-height:1.7;
+}
+
+.highlight{
+  color:#00f7ff;
+  font-weight:bold;
+}
+
+hr{
+  border-color:rgba(0,255,255,0.2);
+}
+
+.team-box{
+  width:180px;
+  text-align:center;
+  background:#010c10;
+  border:1px solid rgba(0,255,255,0.25);
+  border-radius:10px;
+  padding:15px;
+  margin:10px;
+  box-shadow:0 0 10px rgba(0,255,255,0.2);
+  transition:0.3s;
+}
+
+.team-box:hover{
+  transform:translateY(-5px);
+  box-shadow:0 0 20px rgba(0,255,255,0.4);
+}
+
+.team-box b{
+  color:#00f7ff;
+  font-size:18px;
+}
+
+.team-link{
+  text-decoration: none;
+  display: inline-block;
+  color: inherit;
+}
+
+.team-img-wrapper{
+  position:relative;
+  width:80px;
+  height:80px;
+  margin:0 auto 10px;
+}
+
+.team-img{
+  width:100%;
+  height:100%;
+  border-radius:50%;
+  object-fit:cover;
+  border:2px solid #00f7ff;
+  box-shadow:0 0 10px rgba(0,255,255,0.5);
+  display:block;
+}
+
+.team-initials{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%, -50%);
+  color:#00f7ff;
+  font-weight:bold;
+  font-size:22px;
+}
+
+.team-img[src]:not([src=""]) + .team-initials{
+  display:none;
+}
+
+/* 🔥 FIX CLICK */
+.team-link{
+  text-decoration:none;
+  display:inline-block;
+}
+</style>
+
+<div class="container">
+  <div class="row my-5">
+    <div class="col-sm-8 offset-sm-2">
+
+      <h3>About Us</h3>
+      <hr>
+
+      <div class="about-box">
+
+        <!-- HERO -->
+        <h2 style="font-size:40px; font-weight:bold; line-height:1.2;">
+          Built for <span class="highlight">real</span> voices,<br>
+          not algorithms.
+        </h2>
+
+        <p style="border-left:3px solid #00f7ff; padding-left:15px;">
+          We made this because we were tired of platforms that bury good writing.
+          Here, anyone can post, anyone can be read — no gatekeeping. Just words.
+        </p>
+
+        <hr>
+
+        <!-- STATS -->
+        <div style="display:flex; justify-content:space-around; text-align:center; margin:30px 0;">
+          <div>
+            <h2 style="font-size:30px;">∞</h2>
+            <p>stories to tell</p>
+          </div>
+
+          <div>
+            <h2 style="font-size:30px;">0</h2>
+            <p>gatekeepers</p>
+          </div>
+
+          <div>
+            <h2 style="font-size:30px;">{{ team|length }}</h2>
+            <p>humans behind this</p>
+          </div>
+        </div>
+
+        <hr>
+      <!-- TEAM -->
+        <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:20px;">
+
+        {% for member in team %}
+
+        <a href="{% url 'author_profile' member.user.username %}" class="team-link">
+
+          <div class="team-box">
+
+            <div class="team-img-wrapper">
+
+              {% if member.image %}
+                <img src="{{ member.image.url }}" class="team-img">
+              {% endif %}
+
+              <span class="team-initials">{{ member.short_name }}</span>
+
+            </div>
+
+            <b>{{ member.short_name }}</b><br>
+            {{ member.name }}<br>
+            <small>{{ member.role }}</small>
+
+          </div>
+
+        </a>
+
+        {% endfor %}
+
+      </div>
+        <!-- HOW IT STARTED -->
+        <h5 class="text-center mb-3">How it Started</h5>
+
+        <div style="
+          background:#010c10;
+          padding:15px;
+          border-radius:10px;
+          border:1px solid rgba(0,255,255,0.2);
+          box-shadow:0 0 10px rgba(0,255,255,0.2);
+        ">
+          <b style="font-size:25px;">'24</b><br>
+          A group project that refused to end.<br>
+          <small>
+            What started as a semester project turned into something we actually wanted to use.
+          </small>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{% endblock content %}
