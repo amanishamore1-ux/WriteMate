@@ -108,13 +108,7 @@ The platform integrates an **AI Blog Generator** to assist users in generating b
 
 | 🚫 Copyright Detection |
 |-------------------------|
-| <p align="center"><img src="images/copyright.png" width="550"/></p> |
-
----
-
-## 🚫 Copyright Detection
-
-![Copyright Detection](images/copyright.png)
+| <p align="center"><img src="images/copyright.png" width="450"/></p> |
 
 ---
 
