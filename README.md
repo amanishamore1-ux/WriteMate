@@ -88,51 +88,27 @@ The platform integrates an **AI Blog Generator** to assist users in generating b
 
 # 📸 Project Screenshots
 
-## 🏠 Home Page
+# 📸 Screenshots
 
-![Home](images/home.png)
+| 🏠 Home Page | 🔐 Login |
+|--------------|----------|
+| <img src="images/home.png" width="450"/> | <img src="images/login.png" width="450"/> |
 
----
+| 🤖 AI Blog Generator | 📝 Register |
+|----------------------|-------------|
+| <img src="images/write.png" width="450"/> | <img src="images/register.png" width="450"/> |
 
-## ✍️ AI Blog Generator & Blog Editor
+| 👤 Profile | 🔑 Password Reset |
+|------------|-------------------|
+| <img src="images/profile.png" width="450"/> | <img src="images/password-reset.png" width="450"/> |
 
-![Write Blog](images/write.png)
+| ✏️ Edit Blog | 🗑️ Delete Blog |
+|--------------|----------------|
+| <img src="images/edit-blog.png" width="450"/> | <img src="images/delete-blog.png" width="450"/> |
 
----
-
-## 👤 User Profile
-
-![Profile](images/profile.png)
-
----
-
-## 🔐 Login
-
-![Login](images/login.png)
-
----
-
-## 📝 Registration
-
-![Register](images/register.png)
-
----
-
-## 🔑 Password Reset
-
-![Password Reset](images/password-reset.png)
-
----
-
-## ✏️ Edit Blog
-
-![Edit Blog](images/edit-blog.png)
-
----
-
-## 🗑️ Delete Blog
-
-![Delete Blog](images/delete-blog.png)
+| 🚫 Copyright Detection |
+|-------------------------|
+| <p align="center"><img src="images/copyright.png" width="550"/></p> |
 
 ---
 
