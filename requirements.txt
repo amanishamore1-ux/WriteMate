@@ -29,6 +29,7 @@ tabulate
 typing_extensions
 tzdata
 urllib3
+scikit-learn
 uvicorn
 websockets
 whitenoise
